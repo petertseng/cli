@@ -25,7 +25,7 @@ import (
 // downloadCmd represents the download command
 var downloadCmd = &cobra.Command{
 	Use:     "download",
-	Aliases: []string{"d"},
+	Aliases: []string{"d", "dl", "f"},
 	Short:   "Download an exercise.",
 	Long: `Download an exercise.
 
