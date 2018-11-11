@@ -10,6 +10,7 @@ import (
 	"net/http"
 	netURL "net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -110,6 +111,17 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
 		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 			return err
+		}
+
+		if _, err := os.Stat(filepath.Join(metadata.Dir, path)); !os.IsNotExist(err) {
+			// File exists. diff it.
+			cmd := exec.Command("colordiff", filepath.Join(metadata.Dir, path), "/dev/stdin", "--report-identical-files", "--unified")
+			cmd.Stdin = res.Body
+			// Ignore error since diff returns non-zero if there is a diff.
+			// TODO: check exit status 1 vs 2.
+			out, _ := cmd.CombinedOutput()
+			fmt.Println(string(out))
+			continue
 		}
 
 		fmt.Fprintf(Err, "[download] Writing %s\n", sf.path)
