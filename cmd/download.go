@@ -57,7 +57,7 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		return err
 	}
 
-	download, err := newDownload(flags, usrCfg)
+	download, err := newDownload(flags, usrCfg, args)
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ type download struct {
 	payload *downloadPayload
 }
 
-func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
+func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper, args []string) (*download, error) {
 	var err error
 	d := &download{}
 	d.uuid, err = flags.GetString("uuid")
@@ -184,10 +184,25 @@ func newDownload(flags *pflag.FlagSet, usrCfg *viper.Viper) (*download, error) {
 	d.workspace = usrCfg.GetString("workspace")
 
 	if d.uuid == "" {
+		if len(args) >= 1 && d.slug == "" {
+			// Two-arg form: <track> <exercise>
+			// One-arg form: <exercise> (track is inferred)
+			// One-arg form: <track>/<exercise>
+			d.slug = args[len(args)-1]
+			if strings.ContainsRune(d.slug, '/') {
+				components := strings.Split(d.slug, "/")
+				d.track = components[len(components)-2]
+				d.slug = components[len(components)-1]
+			}
+		}
 		if d.slug == "" {
 			if _, slug, ok := trackAndSlugFromCwd(d.workspace); ok && slug != "" {
 				d.slug = slug
 			}
+		}
+		if len(args) >= 2 && d.track == "" && d.team == "" {
+			// Two-arg form: <track> <exercise>
+			d.track = args[0]
 		}
 		if d.track == "" && d.team == "" {
 			if track, _, ok := trackAndSlugFromCwd(d.workspace); ok {
