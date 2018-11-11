@@ -95,11 +95,13 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		defer res.Body.Close()
 
 		if res.StatusCode != http.StatusOK {
+			fmt.Fprintf(Err, "[download] File %s canceled because not OK: %d\n", sf.path, res.StatusCode)
 			// TODO: deal with it
 			continue
 		}
 		// Don't bother with empty files.
 		if res.Header.Get("Content-Length") == "0" {
+			fmt.Fprintf(Err, "[download] File %s canceled because empty\n", sf.path)
 			continue
 		}
 
@@ -109,6 +111,8 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 		if err = os.MkdirAll(dir, os.FileMode(0755)); err != nil {
 			return err
 		}
+
+		fmt.Fprintf(Err, "[download] Writing %s\n", sf.path)
 
 		f, err := os.Create(filepath.Join(metadata.Dir, path))
 		if err != nil {
