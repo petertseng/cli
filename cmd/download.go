@@ -106,6 +106,11 @@ func runDownload(cfg config.Config, flags *pflag.FlagSet, args []string) error {
 			continue
 		}
 
+		if sf.path == ".gitignore" {
+			fmt.Fprintf(Err, "[download] File %s is denied\n", sf.path)
+			continue
+		}
+
 		// TODO: handle collisions
 		path := sf.relativePath()
 		dir := filepath.Join(metadata.Dir, filepath.Dir(path))
