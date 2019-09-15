@@ -5,7 +5,6 @@ require (
 	github.com/davecgh/go-spew v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.2 // indirect
 	github.com/hashicorp/hcl v0.0.0-20170509225359-392dba7d905e // indirect
-	github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/magiconair/properties v1.7.3 // indirect

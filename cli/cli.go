@@ -10,13 +10,10 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"runtime"
 	"strings"
 	"time"
 
 	"github.com/blang/semver"
-	"github.com/exercism/cli/debug"
-	update "github.com/inconshreveable/go-update"
 )
 
 var (
@@ -95,46 +92,8 @@ func (c *CLI) IsUpToDate() (bool, error) {
 
 // Upgrade allows the user to upgrade to the latest version of the CLI.
 func (c *CLI) Upgrade() error {
-	var (
-		OS   = osMap[runtime.GOOS]
-		ARCH = archMap[runtime.GOARCH]
-	)
-
-	if OS == "" || ARCH == "" {
-		return fmt.Errorf("unable to upgrade: OS %s ARCH %s", OS, ARCH)
-	}
-
-	buildName := fmt.Sprintf("%s-%s", OS, ARCH)
-	if BuildARCH == "arm" {
-		if BuildARM == "" {
-			return fmt.Errorf("unable to upgrade: arm version not found")
-		}
-		buildName = fmt.Sprintf("%s-v%s", buildName, BuildARM)
-	}
-
-	var downloadRC *bytes.Reader
-	for _, a := range c.LatestRelease.Assets {
-		if strings.Contains(a.Name, buildName) {
-			debug.Printf("Downloading %s\n", a.Name)
-			var err error
-			downloadRC, err = a.download()
-			if err != nil {
-				return fmt.Errorf("error downloading executable: %s", err)
-			}
-			break
-		}
-	}
-	if downloadRC == nil {
-		return fmt.Errorf("no executable found for %s/%s%s", BuildOS, BuildARCH, BuildARM)
-	}
-
-	bin, err := extractBinary(downloadRC, OS)
-	if err != nil {
-		return err
-	}
-	defer bin.Close()
-
-	return update.Apply(bin, update.Options{})
+	fmt.Println("You should upgrade.")
+	return nil
 }
 
 func (c *CLI) fetchLatestRelease() error {
